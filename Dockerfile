@@ -2,7 +2,7 @@
 FROM mongo:latest
 
 # Создаем директорию для данных
-VOLUME /data/db
+#VOLUME /data/db
 
 # Порт, на котором будет работать MongoDB
 EXPOSE 27017
