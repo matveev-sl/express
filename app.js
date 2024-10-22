@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');  // Подключение Mongoose
 const getUsers = require('./src/controllers/get-users');
 const postTweet = require('./src/controllers/post-tweet');
 const getTweets = require('./src/controllers/get-tweets');
