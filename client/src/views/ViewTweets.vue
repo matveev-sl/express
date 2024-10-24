@@ -48,30 +48,4 @@ export default {
 </script>
 
 <style>
-.tweet-item {
-  margin: 10px 0; /* Отступы между твитами */
-  padding: 10px; /* Внутренние отступы */
-  border: 1px solid #e0e0e0; /* Граница твита */
-  border-radius: 5px; /* Закругление углов */
-  background-color: #f9f9f9; /* Фоновый цвет */
-  transition: background-color 0.3s; /* Плавный переход фона */
-}
-
-.tweet-item:hover {
-  background-color: #f1f1f1; /* Изменение фона при наведении */
-}
-
-.create-tweet-link {
-  display: inline-block; /* Блочный элемент для стилей */
-  margin-bottom: 15px; /* Отступ снизу */
-  padding: 10px 15px; /* Внутренние отступы */
-  background-color: #6200ea; /* Фоновый цвет */
-  color: white; /* Цвет текста */
-  border-radius: 5px; /* Закругление углов */
-  text-decoration: none; /* Убираем подчеркивание */
-}
-
-.create-tweet-link:hover {
-  background-color: #3700b3; /* Темный цвет при наведении */
-}
 </style>
