@@ -1,10 +1,13 @@
 <template>
-    <div>
-      <h1>Создать твит</h1>
-      <input v-model="tweetBody" placeholder="Введите текст твита" />
-      <button @click="saveTweet">Сохранить</button>
-    </div>
-  </template>
+  <div>
+    <h1>Создать твит</h1>
+    <input v-model="tweetBody" placeholder="Введите текст твита" />
+    <button @click="saveTweet">Сохранить</button>
+    
+    <!-- Ссылка на просмотр твитов -->
+    <router-link to="/view">Посмотреть твиты</router-link>
+  </div>
+</template>
 
 <script>
 import { ref } from 'vue'
