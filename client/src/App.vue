@@ -1,9 +1,21 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/create">Создать твит</router-link>
-      <router-link to="/view">Просмотреть твиты</router-link>
-    </nav>
-    <router-view />
-  </div>
+  <v-app>
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'App',
+
+  data () {
+    return {
+      //
+    }
+  },
+})
+</script>

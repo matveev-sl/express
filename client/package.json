@@ -1,50 +1,52 @@
 {
-  "name": "vue",
-  "version": "0.1.0",
+  "name": "twitter",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "vite preview",
+    "build": "vite build",
+    "test:unit": "vitest",
+    "lint": "eslint . --fix",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@mdi/font": "5.9.55",
     "axios": "^1.7.7",
-    "core-js": "^3.8.3",
-    "vue": "^3.2.13",
-    "vue-router": "^4.4.5"
+    "pinia": "^2.2.4",
+    "roboto-fontface": "*",
+    "vite-plugin-vuetify": "^2.0.4",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
+    "vuetify": "^3.7.3",
+    "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "@tsconfig/node20": "^20.1.4",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^20.16.11",
+    "@types/webfontloader": "^1.0.0",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vitejs/plugin-vue-jsx": "^4.0.1",
+    "@vitest/eslint-plugin": "1.1.7",
+    "@vue/eslint-config-prettier": "^10.0.0",
+    "@vue/eslint-config-typescript": "^14.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.5.1",
+    "eslint": "^9.12.0",
+    "eslint-plugin-vue": "^9.29.0",
+    "jsdom": "^25.0.1",
+    "npm-run-all2": "^6.2.3",
+    "prettier": "^3.3.3",
+    "typescript": "~5.5.4",
+    "vite": "^5.4.8",
+    "vite-plugin-vue-devtools": "^7.4.6",
+    "vitest": "^2.1.2",
+    "vue-cli-plugin-vuetify": "~2.5.8",
+    "vue-tsc": "^2.1.6"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/vue3-essential",
-      "@vue/standard"
-    ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ],
-  "_id": "vue@0.1.0",
-  "readme": "ERROR: No README data found!"
+  "type": "module"
 }
