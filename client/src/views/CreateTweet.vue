@@ -3,7 +3,7 @@
     <h1>Создать твит</h1>
     <input v-model="tweetBody" placeholder="Введите текст твита" />
     <button @click="saveTweet">Сохранить</button>
-    <LoginModal :show-modal="showLoginModal" @update:showModal="showLoginModal = $event" />
+    <!-- <LoginModal :show-modal="showLoginModal" @update:showModal="showLoginModal = $event" /> что за строчка?--> 
   </div>
 </template>
 
@@ -20,7 +20,12 @@ export default {
     const showLoginModal = ref(false)
     const saveTweet = async () => {
       try {
-        await axios.post('http://localhost:3000/tweet', { body: tweetBody.value })
+        const userName = sessionStorage.getItem('userName');
+        console.log(userName)
+        await axios.post('http://localhost:3000/tweet', {
+          body: tweetBody.value,
+          userName: userName 
+        });
         tweetBody.value = ''
         alert('Твит сохранен!')
       } catch (error) {
