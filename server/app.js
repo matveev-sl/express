@@ -1,4 +1,5 @@
 const express = require('express');
+const login = require('./src/controllers/login')
 const getUsers = require('./src/controllers/get-users');
 const postTweet = require('./src/controllers/post-tweet');
 const getTweets = require('./src/controllers/get-tweets');
@@ -32,7 +33,7 @@ app.post('/user', async (req, res) => {
 // Эндпоинты для работы с твитами
 app.post('/tweet', postTweet);   // Создание твита
 app.get('/tweets', getTweets);   // Получение всех твитов
-
+app.post('/login', login);   // Получение всех твитов
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
