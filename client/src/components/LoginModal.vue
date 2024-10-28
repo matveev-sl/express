@@ -1,7 +1,7 @@
 <template>
   <v-btn v-if="!isLoggedIn" @click="show = true">Войти</v-btn>
   <div v-else>Привет, {{ userName }}
-    <v-btn @click="logout">Выйти</v-btn>
+     <v-btn @click="logout">Выйти</v-btn>
   </div>
  
   <v-dialog v-model="show" max-width="400">
@@ -40,9 +40,9 @@ import axios from "axios";
       try {
         const response = await axios.post('http://localhost:3000/login', { userName: name.value });
         const { userName: loggedInUserName, token } = response.data;
+        userName.value = loggedInUserName;
         sessionStorage.setItem('userName', loggedInUserName);
         sessionStorage.setItem('token', token);
-        userName.value = loggedInUserName;
         isLoggedIn.value = true;
         name.value = ''
         show.value = false;
