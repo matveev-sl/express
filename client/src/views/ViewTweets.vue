@@ -1,9 +1,6 @@
 <template>
   <div>
     <h1>Просмотреть твиты</h1>
-
-    <!-- Ссылка на страницу создания твита -->
-    <router-link to="/create" class="create-tweet-link">Создать новый твит</router-link>
     
     <!-- Условие для отображения состояния загрузки -->
     <div v-if="loading">Загрузка...</div>
@@ -14,7 +11,8 @@
     <!-- Отображение списка твитов -->
     <ul v-else>
       <li v-for="tweet in tweets" :key="tweet._id" class="tweet-item">
-        {{ tweet.body }}
+        <strong>{{ tweet.userName }}:</strong> {{ tweet.body }}
+
       </li>
     </ul>
   </div>
