@@ -7,7 +7,7 @@ const tweetSchema = new mongoose.Schema({
   },
   userName: {
     type: String,
-    required: false,
+    required: true,
   },
 });
 const Tweet = mongoose.model('Tweet', tweetSchema);

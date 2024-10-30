@@ -24,7 +24,11 @@ export default {
         console.log(userName)
         await axios.post('http://localhost:3000/tweet', {
           body: tweetBody.value,
-          userName: userName 
+          userName: userName,
+
+        }, {
+          headers: {'X-User' : "Slava", 'X-Token' : '123token'}
+
         });
         tweetBody.value = ''
         alert('Твит сохранен!')
