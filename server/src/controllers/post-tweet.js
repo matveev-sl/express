@@ -1,8 +1,9 @@
 const { Tweet } = require('../models/tweet');
 
 module.exports = async (req, res) => {
-  const token = req.headers['X-Token']
-  const user = req.headers['X-User']
+  const token = req.headers['x-token']
+  const user = req.headers['x-user']
+  console.log ("Данные с сервака", token, user)
   if (!token) {
     return res.status(401).json({ message: "Unauthorised"})
   }

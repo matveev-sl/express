@@ -22,12 +22,11 @@
 import { ref, onMounted } from 'vue';
 import axios from "axios";
 import { useUserStore } from '@/stores/userStore';
+// import { login as apiLogin } from '@/api';
 const userStore = useUserStore(); 
 
   const show = ref(false)
   const name = ref('')
-  const isLoggedIn = ref(false)
-  const userName = ref('')
 
   onMounted(() => {
   userStore.initializeUser(); 

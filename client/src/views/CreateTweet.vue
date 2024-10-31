@@ -10,6 +10,7 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useUserStore } from '@/stores/userStore';
 
 export default {
   components: {
@@ -18,10 +19,12 @@ export default {
   setup () {
     const tweetBody = ref('')
     const showLoginModal = ref(false)
+    const userStore = useUserStore();
     const saveTweet = async () => {
       try {
-        const userName = localStorage.getItem('userName');
-        const token = localStorage.getItem('token')
+        const userName = userStore.userName;
+        const token = userStore.token;
+        console.log ("Юзернейм и токен из пиньи", userName, token)
         console.log(userName)
         await axios.post('http://localhost:3000/tweet', {
           body: tweetBody.value,
