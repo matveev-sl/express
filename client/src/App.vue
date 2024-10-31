@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <Hea/>
+      <Header/>
       <router-view/>
     </v-main>
   </v-app>
@@ -9,11 +9,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Hea from "@/components/Header.vue"
+import Header from "@/components/Header.vue"
 export default defineComponent({
   name: 'App',
   components: {
-    Hea
+    Header
   },
   data () {
     return {

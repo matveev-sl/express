@@ -20,14 +20,15 @@ export default {
     const showLoginModal = ref(false)
     const saveTweet = async () => {
       try {
-        const userName = sessionStorage.getItem('userName');
+        const userName = localStorage.getItem('userName');
+        const token = localStorage.getItem('token')
         console.log(userName)
         await axios.post('http://localhost:3000/tweet', {
           body: tweetBody.value,
           userName: userName,
 
         }, {
-          headers: {'X-User' : "Slava", 'X-Token' : '123token'}
+          headers: {'X-User' : userName, 'X-Token' : token}
 
         });
         tweetBody.value = ''
