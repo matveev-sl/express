@@ -1,11 +1,9 @@
 const express = require('express');
 const login = require('./src/controllers/login')
 const getUsers = require('./src/controllers/get-users');
-const postTweet = require('./src/controllers/post-tweet');
-const getTweets = require('./src/controllers/get-tweets');
 const { User } = require('./src/models/user');  // Модель пользователя
 const cors = require('cors');
-// const tweetRoutes = require('./src/tweetRoutes');
+const tweetRouter = require('./src/controllers/tweets.router');
 
 
 const app = express();
@@ -31,9 +29,7 @@ app.post('/user', async (req, res) => {
 });
 
 // Эндпоинты для работы с твитами
-app.post('/tweet', postTweet);   // Создание твита
-app.get('/tweets', getTweets);   // Получение всех твитов
-// app.use('/tweet', tweetRoutes);
+app.use('/tweets', tweetRouter);
 app.post('/login', login);   // Получение всех твитов
 const PORT = 3000;
 app.listen(PORT, () => {

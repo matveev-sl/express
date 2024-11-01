@@ -1,7 +1,7 @@
 // src/api.ts
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
-
+const BACKEND_URL = 'http://localhost:3000/';
 // Функция для получения токена из Pinia
 const getAuthHeaders = () => {
   const userStore = useUserStore();
@@ -18,7 +18,7 @@ const getAuthHeaders = () => {
 
 // Функция логина пользователя
 export const loginUser = async (userName: string) => {
-  const response = await axios.post('http://localhost:3000/login', { userName });
+  const response = await axios.post(BACKEND_URL + 'login', { userName });
   return response.data;
 };
 
@@ -26,9 +26,8 @@ export const loginUser = async (userName: string) => {
 export async function saveTweet(tweetBody: string, userName: string, token: string) {
   try {
     console.log("Юзернейм и токен из параметров", userName, token);
-    await axios.post('http://localhost:3000/tweet', {
-      body: tweetBody,
-      userName: userName,
+    await axios.post('http://localhost:3000/tweets', {
+      text: tweetBody
     }, {
       headers: { 'X-User': userName, 'X-Token': token },
     });
