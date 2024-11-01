@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const tweetSchema = new mongoose.Schema({
-  body: {
+  text: {
     type: String,
     required: true,
   },
@@ -9,7 +9,12 @@ const tweetSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
+
 const Tweet = mongoose.model('Tweet', tweetSchema);
 
 module.exports = { Tweet };

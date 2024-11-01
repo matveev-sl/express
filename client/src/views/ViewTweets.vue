@@ -11,7 +11,7 @@
     <!-- Отображение списка твитов -->
     <ul v-else>
       <li v-for="tweet in tweets" :key="tweet._id" class="tweet-item">
-        <strong>{{ tweet.userName }}:</strong> {{ tweet.body }}
+        <strong>{{ tweet.userName }}:</strong> {{ tweet.body }} - {{ tweet.createdAt }}
 
       </li>
     </ul>
