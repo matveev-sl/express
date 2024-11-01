@@ -20,42 +20,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from "axios";
 import { useUserStore } from '@/stores/userStore';
-// import { login as apiLogin } from '@/api';
-const userStore = useUserStore(); 
+import { loginUser } from '@/api';
 
-  const show = ref(false)
-  const name = ref('')
+const userStore = useUserStore();
+const show = ref(false);
+const name = ref('');
 
-  onMounted(() => {
-  userStore.initializeUser(); 
-  console.log('User store state after initialization:', userStore.$state);
+onMounted(() => {
+  userStore.initializeUser();
 });
 
+const login = async () => {
+  try {
+    const response = await loginUser(name.value);
+    const { userName: loggedInUserName, token } = response;
+    userStore.setUser(loggedInUserName, token);
+    show.value = false;
+  } catch (error) {
+    console.error('Ошибка при логине:', error);
+  }
+};
 
-  const login = async () => {
-      try {
-        const response = await axios.post('http://localhost:3000/login', { userName: name.value });
-        const { userName: loggedInUserName, token } = response.data;
-        userStore.setUser(loggedInUserName, token);
-        console.log('Сохраненные данные в Pinia:', userStore.$state);
-        userName.value = loggedInUserName;
-        localStorage.setItem('userName', loggedInUserName);
-        localStorage.setItem('token', token);
-        isLoggedIn.value = true;
-        name.value = ''
-        show.value = false;
-        console.log("Вывод логина" , response)
-      } catch (error) {
-        console.error('Ошибка при Логине:', error)
-      }
-    }
-    const logout = () => {
-      userStore.logout();
-      localStorage.removeItem('token');
-      localStorage.removeItem('userName');
-      userName.value = '';
-      isLoggedIn.value = false;
-}
+const logout = () => {
+  userStore.logout();
+};
 </script>
