@@ -2,42 +2,27 @@
   <div>
     <h1>Создать твит</h1>
     <input v-model="tweetBody" placeholder="Введите текст твита" />
-    <button @click="saveTweet">Сохранить</button>
-    <!-- <LoginModal :show-modal="showLoginModal" @update:showModal="showLoginModal = $event" /> что за строчка?--> 
+    <button @click="saveTweetAction">Сохранить</button>
   </div>
 </template>
 
-<script>
-import { ref } from 'vue'
-import axios from 'axios'
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/userStore';
+import { saveTweet } from '@/api';
 
-export default {
-  components: {
-  
-  },
-  setup () {
-    const tweetBody = ref('')
-    const showLoginModal = ref(false)
-    const saveTweet = async () => {
-      try {
-        const userName = sessionStorage.getItem('userName');
-        console.log(userName)
-        await axios.post('http://localhost:3000/tweet', {
-          body: tweetBody.value,
-          userName: userName,
+const tweetBody = ref('');
+const userStore = useUserStore();
 
-        }, {
-          headers: {'X-User' : "Slava", 'X-Token' : '123token'}
-
-        });
-        tweetBody.value = ''
-        alert('Твит сохранен!')
-      } catch (error) {
-        console.error('Ошибка при сохранении твита:', error)
-      }
-    }
-
-    return { tweetBody, saveTweet, showLoginModal }
+const saveTweetAction = async () => {
+  try {
+    const userName = userStore.userName;
+    const token = userStore.token;
+    await saveTweet(tweetBody.value, userName, token);
+    tweetBody.value = '';
+    alert('Твит сохранен!');
+  } catch (error) {
+    console.error('Ошибка при сохранении твита:', error);
   }
-}
+};
 </script>

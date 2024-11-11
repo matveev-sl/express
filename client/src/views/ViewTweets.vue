@@ -11,38 +11,31 @@
     <!-- Отображение списка твитов -->
     <ul v-else>
       <li v-for="tweet in tweets" :key="tweet._id" class="tweet-item">
-        <strong>{{ tweet.userName }}:</strong> {{ tweet.body }}
+        <strong>{{ tweet.userName }}:</strong> {{ tweet.text }} - {{ tweet.createdAt }}
 
       </li>
     </ul>
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { fetchTweets } from '@/api';
 
-export default {
-  setup () {
-    const tweets = ref([])
-    const loading = ref(true) // Состояние загрузки
+const tweets = ref([]);
+const loading = ref(true);
 
-    const fetchTweets = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/tweets')
-        tweets.value = response.data // Заполняем массив твитов
-      } catch (error) {
-        console.error('Ошибка при получении твитов:', error)
-      } finally {
-        loading.value = false // Устанавливаем состояние загрузки в false после получения данных
-      }
-    }
-
-    onMounted(fetchTweets) // Получаем твиты при монтировании компонента
-
-    return { tweets, loading }
+const fetchTweetsAction = async () => {
+  try {
+    tweets.value = await fetchTweets();
+  } catch (error) {
+    console.error('Ошибка при получении твитов:', error);
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+onMounted(fetchTweetsAction);
 </script>
 
 <style>

@@ -1,6 +1,6 @@
 <template>
-  <v-btn v-if="!isLoggedIn" @click="show = true">Войти</v-btn>
-  <div v-else>Привет, {{ userName }}
+  <v-btn v-if="!userStore.isLoggedIn" @click="show = true">Войти</v-btn>
+  <div v-else>Привет, {{ userStore.userName }}
      <v-btn @click="logout">Выйти</v-btn>
   </div>
  
@@ -20,41 +20,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from "axios";
-  const show = ref(false)
-  const name = ref('')
-  const isLoggedIn = ref(false)
-  const userName = ref('')
+import { useUserStore } from '@/stores/userStore';
+import { loginUser } from '@/api';
 
-  onMounted(() => {
-  const token = sessionStorage.getItem('token');
-  const storedUserName = sessionStorage.getItem('userName');
+const userStore = useUserStore();
+const show = ref(false);
+const name = ref('');
 
-  if (token && storedUserName) {
-    userName.value = storedUserName;
-    isLoggedIn.value = true;
-  }
+onMounted(() => {
+  userStore.initializeUser();
 });
 
-  const login = async () => {
-      try {
-        const response = await axios.post('http://localhost:3000/login', { userName: name.value });
-        const { userName: loggedInUserName, token } = response.data;
-        userName.value = loggedInUserName;
-        sessionStorage.setItem('userName', loggedInUserName);
-        sessionStorage.setItem('token', token);
-        isLoggedIn.value = true;
-        name.value = ''
-        show.value = false;
-        console.log("Вывод логина" , response)
-      } catch (error) {
-        console.error('Ошибка при Логине:', error)
-      }
-    }
-    const logout = () => {
-  sessionStorage.removeItem('token');
-  sessionStorage.removeItem('userName');
-  userName.value = '';
-  isLoggedIn.value = false;
-}
+const login = async () => {
+  try {
+    const response = await loginUser(name.value);
+    const { userName: loggedInUserName, token } = response;
+    userStore.setUser(loggedInUserName, token);
+    show.value = false;
+  } catch (error) {
+    console.error('Ошибка при логине:', error);
+  }
+};
+
+const logout = () => {
+  userStore.logout();
+};
 </script>
