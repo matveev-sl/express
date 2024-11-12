@@ -1,8 +1,10 @@
-// src/api.ts
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
+
+// Базовый URL для API
 const BACKEND_URL = 'http://localhost:3000/';
-// Функция для получения токена из Pinia
+
+// Получение токена и имени пользователя из Pinia
 const getAuthHeaders = () => {
   const userStore = useUserStore();
   const token = userStore.token;
@@ -18,27 +20,52 @@ const getAuthHeaders = () => {
 
 // Функция логина пользователя
 export const loginUser = async (userName: string) => {
-  const response = await axios.post(BACKEND_URL + 'login', { userName });
-  return response.data;
+  try {
+    const response = await axios.post(`${BACKEND_URL}login`, { userName });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при логине:', error);
+    throw new Error('Не удалось войти');
+  }
+};
+
+// Функция для регистрации пользователя
+export const registerUser = async (data: { name: string, email: string, password: string }) => {
+  try {
+    const response = await axios.post(`${BACKEND_URL}user`, data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('Ошибка ответа от сервера:', error.response);
+      throw error; // Повторно выбрасываем ошибку для обработки в компоненте
+    } else {
+      console.error('Ошибка при запросе:', error);
+      throw error;
+    }
+  }
 };
 
 // Функция для создания твита
-export async function saveTweet(tweetBody: string, userName: string, token: string) {
+export const saveTweet = async (tweetBody: string, userName: string, token: string) => {
   try {
-    console.log("Юзернейм и токен из параметров", userName, token);
-    await axios.post('http://localhost:3000/tweets', {
-      text: tweetBody
-    }, {
-      headers: { 'X-User': userName, 'X-Token': token },
-    });
+    await axios.post(`${BACKEND_URL}tweets`, {
+      text: tweetBody,
+    }, getAuthHeaders());
+
     alert('Твит сохранен!');
   } catch (error) {
     console.error('Ошибка при сохранении твита:', error);
+    alert('Не удалось сохранить твит');
   }
-}
+};
 
 // Функция для получения списка твитов
 export const fetchTweets = async () => {
-  const response = await axios.get('http://localhost:3000/tweets');
-  return response.data;
+  try {
+    const response = await axios.get(`${BACKEND_URL}tweets`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при получении твитов:', error);
+    throw new Error('Не удалось получить твиты');
+  }
 };
