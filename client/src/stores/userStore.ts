@@ -18,6 +18,8 @@ interface UserState {
         this.userName = name;
         this.token = token;
         this.isLoggedIn = true;
+        localStorage.setItem('userName', name);
+        localStorage.setItem('token', token);
       },
       logout() {
         this.userName = '';

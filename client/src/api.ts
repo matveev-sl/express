@@ -18,14 +18,29 @@ const getAuthHeaders = () => {
   };
 };
 
-// Функция логина пользователя
-export const loginUser = async (userName: string) => {
+export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${BACKEND_URL}login`, { userName });
-    return response.data;
+    const response = await axios.post(BACKEND_URL + 'login', { email, password });
+    const data = response.data;
+
+    if (data.token) {
+      // Получаем store и сохраняем токен и имя пользователя
+      const userStore = useUserStore();
+      userStore.setUser({
+        token: data.token,
+        userName: data.userName, 
+      });
+    }
+
+    return data;
   } catch (error) {
-    console.error('Ошибка при логине:', error);
-    throw new Error('Не удалось войти');
+    if (error.response && error.response.status === 400) {
+      console.error('Неверные данные для входа:', error.response.data.message);
+      throw new Error('Неверные данные для входа');
+    } else {
+      console.error('Ошибка при попытке входа:', error);
+      throw new Error('Ошибка на сервере, попробуйте позже');
+    }
   }
 };
 

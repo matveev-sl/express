@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore} from '@/stores/userStore';
 import { loginUser, registerUser } from '@/api';
 
 const userStore = useUserStore();
@@ -54,14 +54,28 @@ const toggleMode = () => {
 
 const login = async () => {
   try {
-    const response = await loginUser(name.value);
-    const { userName: loggedInUserName, token } = response;
-    userStore.setUser(loggedInUserName, token);
-    show.value = false;
+    const response = await loginUser(email.value, password.value);
+    const { userName, token } = response; // Извлекаем userName из ответа
+    userStore.setUser(userName, token); // Сохраняем имя пользователя и токен в хранилище
+    console.log("Данные успешно переданы в стор:", { userName, token });
+    show.value = false; // Закрываем модальное окно
   } catch (error) {
     console.error('Ошибка при логине:', error);
+    if (error.response) {
+      if (error.response.status === 400) {
+        alert('Пользователь с таким email не существует.');
+      } else if (error.response.status === 401) {
+        alert('Неверный пароль.');
+      } else {
+        alert('Произошла ошибка при авторизации. Попробуйте снова.');
+      }
+    } else {
+      alert('Произошла неожиданная ошибка.');
+    }
   }
 };
+
+
 
 const register = async () => {
   if (password.value !== confirmPassword.value) {
