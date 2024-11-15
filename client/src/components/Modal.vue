@@ -1,31 +1,19 @@
 <template>
-    <v-dialog v-model="isOpen" max-width="800">
+    <v-dialog :model-value="isOpen" max-width="800">
       <v-card>
         <slot></slot>
-
-      
+        <v-btn @click="close">Close</v-btn>
       </v-card>
-     
     </v-dialog>
   </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { defineProps, defineEmits } from 'vue';
+const emits = defineEmits(['close']);
 
+const {isOpen} = defineProps<{ isOpen: boolean }>()
 
-import { ref, defineProps, defineEmits } from 'vue';
-// const emits = defineEmits(['close']);
-// const props = defineProps({
-//       modelValue: {
-//       type: Boolean,
-//       required: true,
-//     },
-//   });
-
-
-    // const isOpen = ref(true);
-    // const close = () => {
-    //   emit('update:modelValue', false);
-    // };
-
-
+const close = () => {
+  emits("close");
+};
 </script>
