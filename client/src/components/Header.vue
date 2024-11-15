@@ -3,16 +3,16 @@
     <router-link to="/view">Посмотреть твиты</router-link>
     <router-link to="/create">Создать твит</router-link>
   </div>
-  <LoginModal/>
+  <AuthDialog />
 </template>
 
 <script>
 import { ref } from 'vue'
-import LoginModal from '@/components/LoginModal.vue'
+import AuthDialog from '@/components/Modal.vue'
 
 export default {
   components: {
-    LoginModal
+    AuthDialog
   },
   setup () {
     const showLoginModal = ref(false)
