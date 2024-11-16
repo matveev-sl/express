@@ -5,16 +5,19 @@
   </div>
   <v-btn @click="open">Открыть</v-btn>
   <Modal :isOpen=showModal @close="close">
-    <p> Привет я контент модал </p>
+    <template #close>
+      Custom close
+    </template>
+    <p>Привет я контент модал!</p>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import {ref} from 'vue'
 import Modal from '@/components/Modal.vue'
-const showModal = ref(true)
+const showModal = ref(false)
 
-const open = ()=>{
+const open = ()=> {
   showModal.value = true
 }
 const close = ()=>{
