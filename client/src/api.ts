@@ -1,8 +1,10 @@
-// src/api.ts
 import axios from 'axios';
 import { useUserStore } from '@/stores/userStore';
+
+// Базовый URL для API
 const BACKEND_URL = 'http://localhost:3000/';
-// Функция для получения токена из Pinia
+
+// Получение токена и имени пользователя из Pinia
 const getAuthHeaders = () => {
   const userStore = useUserStore();
   const token = userStore.token;
@@ -16,29 +18,68 @@ const getAuthHeaders = () => {
   };
 };
 
-// Функция логина пользователя
-export const loginUser = async (userName: string) => {
-  const response = await axios.post(BACKEND_URL + 'login', { userName });
-  return response.data;
+export const loginUser = async (email: string, password: string) => {
+  try {
+    const response = await axios.post(BACKEND_URL + 'users/login', { email, password });
+    const data = response.data;
+
+    if (data.token) {
+      const userStore = useUserStore();
+      userStore.setUser({
+        token: data.token,
+        userName: data.userName, 
+      });
+    }
+
+    return data;
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      console.error('Неверные данные для входа:', error.response.data.message);
+      throw new Error('Неверные данные для входа');
+    } else {
+      console.error('Ошибка при попытке входа:', error);
+      throw new Error('Ошибка на сервере, попробуйте позже');
+    }
+  }
+};
+
+// Функция для регистрации пользователя
+export const registerUser = async (data: { name: string, email: string, password: string }) => {
+  try {
+    const response = await axios.post(`${BACKEND_URL}users/register`, data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('Ошибка ответа от сервера:', error.response);
+      throw error; // Повторно выбрасываем ошибку для обработки в компоненте
+    } else {
+      console.error('Ошибка при запросе:', error);
+      throw error;
+    }
+  }
 };
 
 // Функция для создания твита
-export async function saveTweet(tweetBody: string, userName: string, token: string) {
+export const saveTweet = async (tweetBody: string, userName: string, token: string) => {
   try {
-    console.log("Юзернейм и токен из параметров", userName, token);
-    await axios.post('http://localhost:3000/tweets', {
-      text: tweetBody
-    }, {
-      headers: { 'X-User': userName, 'X-Token': token },
-    });
+    await axios.post(`${BACKEND_URL}tweets`, {
+      text: tweetBody,
+    }, getAuthHeaders());
+
     alert('Твит сохранен!');
   } catch (error) {
     console.error('Ошибка при сохранении твита:', error);
+    alert('Не удалось сохранить твит');
   }
-}
+};
 
 // Функция для получения списка твитов
 export const fetchTweets = async () => {
-  const response = await axios.get('http://localhost:3000/tweets');
-  return response.data;
+  try {
+    const response = await axios.get(`${BACKEND_URL}tweets`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при получении твитов:', error);
+    throw new Error('Не удалось получить твиты');
+  }
 };
