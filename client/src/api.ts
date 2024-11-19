@@ -20,11 +20,10 @@ const getAuthHeaders = () => {
 
 export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(BACKEND_URL + 'login', { email, password });
+    const response = await axios.post(BACKEND_URL + 'users/login', { email, password });
     const data = response.data;
 
     if (data.token) {
-      // Получаем store и сохраняем токен и имя пользователя
       const userStore = useUserStore();
       userStore.setUser({
         token: data.token,
@@ -47,7 +46,7 @@ export const loginUser = async (email: string, password: string) => {
 // Функция для регистрации пользователя
 export const registerUser = async (data: { name: string, email: string, password: string }) => {
   try {
-    const response = await axios.post(`${BACKEND_URL}user`, data);
+    const response = await axios.post(`${BACKEND_URL}users/register`, data);
     return response.data;
   } catch (error) {
     if (error.response) {

@@ -32,8 +32,7 @@ const login = async () => {
     const { userName, token } = response; // Извлекаем userName из ответа
     userStore.setUser(userName, token); // Сохраняем имя пользователя и токен в хранилище
     console.log("Данные успешно переданы в стор:", { userName, token });
-    console.log('closeModal доступен?', typeof close === 'function', close())
-
+    close();
   } catch (error) {
     console.error('Ошибка при логине:', error);
     if (error.response) {

@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
 
 
 router.get('/', async (req, res) => {
-   
+      
       const tweets = await getAllTweets();
       res.status(200).json(tweets);
     
