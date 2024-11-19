@@ -1,18 +1,41 @@
 <template>
   <v-card-text>
     <!-- Показываем поле "Имя" и "Подтверждение пароля" только в режиме регистрации -->
-    <v-text-field v-if="!isLoginMode" v-model="name" label="Введите ваше имя" />
-    <v-text-field v-model="email" label="Введите ваш email" />
-    <v-text-field v-model="password" label="Введите пароль" type="password" />
+    <v-text-field
+      v-if="!isLoginMode"
+      v-model="name"
+      label="Введите ваше имя"
+      :rules="nameRules"
+      required
+    />
+    <v-text-field
+      v-model="email"
+      label="Введите ваш email"
+      :rules="emailRules"
+      required
+    />
+    <v-text-field
+      v-model="password"
+      label="Введите пароль"
+      type="password"
+      :rules="passwordRules"
+      required
+    />
     <v-text-field
       v-if="!isLoginMode"
       v-model="confirmPassword"
       label="Подтвердите пароль"
       type="password"
+      :rules="[confirmPasswordRule]"
+      required
     />
   </v-card-text>
-  <v-btn @click="register">Зарегистрироваться</v-btn>
-  <v-btn @click="toggleMode">Уже есть аккаунт? Войти</v-btn>
+  <v-btn :disabled="!isFormValid()" @click="register">
+    {{ isLoginMode ? 'Войти' : 'Зарегистрироваться' }}
+  </v-btn>
+  <v-btn @click="toggleMode">
+    {{ isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти' }}
+  </v-btn>
 </template>
 
 <script setup>
@@ -26,6 +49,44 @@ const password = ref('');
 const confirmPassword = ref('');
 const isLoginMode = ref(false); // Состояние для переключения между регистрацией и логином
 
+// Правила для валидации
+const nameRules = [
+  (v) => !!v || 'Имя обязательно',
+  (v) => v.length >= 2 || 'Имя должно содержать не менее 2 символов',
+];
+const emailRules = [
+  (v) => !!v || 'Email обязателен',
+  (v) => /.+@.+\..+/.test(v) || 'Введите корректный email',
+];
+const passwordRules = [
+  (v) => !!v || 'Пароль обязателен',
+  (v) => v.length >= 8 || 'Пароль должен быть не менее 8 символов',
+  (v) => /[A-Z]/.test(v) || 'Пароль должен содержать хотя бы одну заглавную букву',
+  (v) => /[a-z]/.test(v) || 'Пароль должен содержать хотя бы одну строчную букву',
+  (v) => /\d/.test(v) || 'Пароль должен содержать хотя бы одну цифру',
+];
+const confirmPasswordRule = (v) =>
+  v === password.value || 'Пароли должны совпадать';
+
+// Проверка валидности всей формы
+const isFormValid = () => {
+  if (!isLoginMode.value) {
+    // Режим регистрации
+    return (
+      nameRules.every((rule) => rule(name.value) === true) &&
+      emailRules.every((rule) => rule(email.value) === true) &&
+      passwordRules.every((rule) => rule(password.value) === true) &&
+      confirmPasswordRule(confirmPassword.value) === true
+    );
+  } else {
+    // Режим логина
+    return (
+      emailRules.every((rule) => rule(email.value) === true) &&
+      passwordRules.every((rule) => rule(password.value) === true)
+    );
+  }
+};
+
 // Пропс для закрытия модального окна
 const { close } = defineProps({
   close: {
@@ -36,8 +97,8 @@ const { close } = defineProps({
 
 // Функция для регистрации
 const register = async () => {
-  if (password.value !== confirmPassword.value) {
-    showMessage('Пароли не совпадают', 'error');
+  if (!isFormValid()) {
+    showMessage('Форма заполнена некорректно!', 'error');
     return;
   }
 
