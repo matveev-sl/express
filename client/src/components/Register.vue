@@ -77,7 +77,7 @@ const isFormValid = computed(() => {
 
 const register = async () => {
   try {
-    const response = await registerUser({
+     await registerUser({
       name: name.value,
       email: email.value,
       password: password.value,
@@ -85,7 +85,7 @@ const register = async () => {
     alert('Регистрация успешна!');
     close(); 
   } catch (error) {
-    alert('Ошибка при регистрации. Попробуйте снова.');
+    alert(error);
   }
 };
 </script>
