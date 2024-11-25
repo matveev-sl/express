@@ -32,10 +32,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 
     let image = null;
+    console.log('Req.file?', req.file)
     if (req.file) {
       image = req.file.path; // Сохраняем путь к изображению
     }
-
+    console.log('Imagepath', image)
     const tweet = await createTweet(text, userName, image); // Передаем изображение
     res.status(201).json({ message: 'Tweet created', tweet });
   } catch (error) {

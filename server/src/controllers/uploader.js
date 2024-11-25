@@ -1,10 +1,9 @@
 const multer = require('multer');
 const path = require('path');
 
-// Настройка хранилища для multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Папка для хранения изображений
+    cb(null, 'uploads/'); 
   },
   filename: (req, file, cb) => {
     const fileExtension = path.extname(file.originalname); // Получаем расширение файла
@@ -12,7 +11,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// Инициализируем multer с настройками
 const upload = multer({ storage });
 
 module.exports = upload;

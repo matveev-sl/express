@@ -3,18 +3,16 @@ const path = require('path');
 
 // Функция создания твита с учетом изображения
 async function createTweet(text, userName, imageFile) {
-  let imagePath = null;
-  
-  // Если файл изображения был загружен, сохраняем его путь
+
   if (imageFile) {
-    imagePath = imageFile.path;  // Путь к загруженному файлу
+    imagePath = imageFile; 
+    console.log ("Сохраняется ли", imagePath);
   }
 
-  // Создание нового твита
   const tweet = new Tweet({
     text,
     userName,
-    image: imagePath, // Сохраняем путь к изображению в базе данных
+    image: imagePath, 
   });
 
   await tweet.save();
@@ -22,7 +20,7 @@ async function createTweet(text, userName, imageFile) {
     text: tweet.text,
     userName: tweet.userName,
     createdAt: tweet.createdAt,
-    image: tweet.image, // Возвращаем путь к изображению
+    image: tweet.image, 
   };
 }
 
