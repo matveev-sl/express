@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { saveTweet } from '@/api'; 
 
 const tweetBody = ref('');
 const userStore = useUserStore();
@@ -32,23 +31,19 @@ const handleImageUpload = (event: Event) => {
 };
 
 // Функция для отправки твита
+// Отправка твита через Pinia
 const saveTweetAction = async () => {
   try {
-    const userName = userStore.userName;
-    const token = userStore.token;
-    
     if (!tweetBody.value || !imageFile.value) {
       alert('Пожалуйста, заполните текст');
       return;
     }
+    await userStore.saveTweet(tweetBody.value, imageFile.value);
 
-    await saveTweet(tweetBody.value, imageFile.value, userName, token);
-
-    // После успешного сохранения очищаем поля
+    // Очистка формы
     tweetBody.value = '';
     imageFile.value = null;
     imagePreviewUrl.value = '';
-
     alert('Твит сохранен!');
   } catch (error) {
     alert('Не удалось сохранить твит');
