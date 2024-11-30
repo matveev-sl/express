@@ -38,7 +38,7 @@ const saveTweetAction = async () => {
     const token = userStore.token;
     
     if (!tweetBody.value || !imageFile.value) {
-      alert('Пожалуйста, заполните текст и выберите изображение!');
+      alert('Пожалуйста, заполните текст');
       return;
     }
 
@@ -51,7 +51,6 @@ const saveTweetAction = async () => {
 
     alert('Твит сохранен!');
   } catch (error) {
-    console.error('Ошибка при сохранении твита:', error);
     alert('Не удалось сохранить твит');
   }
 };
