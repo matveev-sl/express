@@ -25,8 +25,13 @@ async function createTweet(text, userName, imageFile) {
 }
 
 // Функция получения всех твитов
-async function getAllTweets() {
-  const tweets = await Tweet.find().lean();
+async function getPaginatedTweets(limit = 5, skip = 0) {
+  const tweets = await Tweet.find()
+    .sort({ createdAt: -1 }) // Сортировка от новых к старым
+    .skip(skip)              // Пропускаем определенное количество твитов
+    .limit(limit)            // Ограничиваем количество твитов
+    .lean();
+
   return tweets.map(tweet => ({
     text: tweet.text,
     userName: tweet.userName,
@@ -37,5 +42,5 @@ async function getAllTweets() {
 
 module.exports = {
   createTweet,
-  getAllTweets,
+  getPaginatedTweets, // Используем эту функцию вместо getAllTweets
 };

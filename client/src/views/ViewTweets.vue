@@ -20,6 +20,14 @@
         </div>
       </li>
     </ul>
+
+    <!-- Кнопка для загрузки дополнительных твитов -->
+    <div v-if="!loading && !noMoreTweets">
+      <button @click="loadMoreTweets" class="load-more-button">Загрузить еще</button>
+    </div>
+
+    <!-- Сообщение, если все твиты загружены -->
+    <div v-if="noMoreTweets" class="no-more-tweets">Больше твитов нет</div>
   </div>
 </template>
 
@@ -27,18 +35,32 @@
 import { ref, onMounted } from 'vue';
 import { fetchTweets } from '@/api'; // Функция для получения твитов с API
 
-const tweets = ref([]); // Массив твитов
-const loading = ref(true); // Состояние загрузки
-const BASE_URL = 'http://localhost:3000'
+const tweets = ref<Array<any>>([]); // Массив твитов
+const loading = ref<boolean>(true); // Состояние загрузки
+const skip = ref<number>(0); // Параметр для пагинации
+const limit = ref<number>(5); // Лимит для пагинации
+const noMoreTweets = ref<boolean>(false); // Флаг, если твиты больше не загружаются
+const BASE_URL = 'http://localhost:3000';
 
-const getFullImageUrl = (imagePath) => {
-  const fullUrl = `${BASE_URL}/${imagePath}`
-  console.log ("ФуллУрл", fullUrl)
-  return fullUrl;
+const getFullImageUrl = (imagePath: string): string => {
+  return `${BASE_URL}/${imagePath}`;
 };
+
+// Функция для загрузки твитов
 const fetchTweetsAction = async () => {
   try {
-    tweets.value = await fetchTweets(); // Получаем твиты
+    const currentScrollPosition = window.scrollY;
+    const newTweets = await fetchTweets(skip.value, limit.value); 
+    if (newTweets.length === 0) {
+      noMoreTweets.value = true; 
+     
+    } else {
+      tweets.value.push(...newTweets); 
+      skip.value += limit.value; 
+    }
+    requestAnimationFrame(() => {
+      window.scrollTo(0, currentScrollPosition);
+    });
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
   } finally {
@@ -46,7 +68,14 @@ const fetchTweetsAction = async () => {
   }
 };
 
-onMounted(fetchTweetsAction); // Загружаем твиты при монтировании компонента
+// Функция для загрузки дополнительных твитов по кнопке
+const loadMoreTweets = () => {
+  loading.value = true;
+  fetchTweetsAction();
+};
+
+// Загружаем твиты при монтировании компонента
+onMounted(fetchTweetsAction);
 </script>
 
 <style scoped>
@@ -96,5 +125,26 @@ h1 {
   height: auto;
   margin-top: 10px;
   border-radius: 8px;
+}
+
+.load-more-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.load-more-button:hover {
+  background-color: #45a049;
+}
+
+.no-more-tweets {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
 }
 </style>

@@ -1,13 +1,12 @@
-const { createTweet, getAllTweets } = require('../actions/tweets.actions');
+const { createTweet, getPaginatedTweets } = require('../actions/tweets.actions');
 const { Router } = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = Router();
 
-// Настроим хранение файлов с помощью multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Папка для хранения файлов
+    cb(null, 'uploads/'); 
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Уникальное имя для файла
@@ -47,7 +46,9 @@ router.post('/', upload.single('image'), async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const tweets = await getAllTweets();
+    const skip = parseInt(req.query.skip) || 0;
+    const limit = parseInt(req.query.limit) || 5;
+    const tweets = await getPaginatedTweets(Number(limit), Number(skip));
     res.status(200).json(tweets);
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);

@@ -112,9 +112,15 @@ export const saveTweet = async (tweetBody: string, imageFile: File | null, userN
   }
 };
 
-export const fetchTweets = async () => {
+export const fetchTweets = async (skip: number, limit: number) => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/tweets`, getAuthHeaders());
+    const response = await axios.get(`${BACKEND_URL}/tweets`, {
+      params: {
+        skip,  
+        limit, 
+      },
+      headers: getAuthHeaders(),  
+    });
     return response.data;
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);

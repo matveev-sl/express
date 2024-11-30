@@ -5,6 +5,11 @@ interface UserState {
   userName: string;
   token: string;
   isLoggedIn: boolean;
+  tweets: Array<{ text: string, userName: string, createdAt: string, image: string | null }>;
+  loadingTweets: boolean;
+  skip: number;
+  limit: number;
+  error: string | null;
 }
 
 export const useUserStore = defineStore('user', {
@@ -12,6 +17,11 @@ export const useUserStore = defineStore('user', {
     userName: '',
     token: '',
     isLoggedIn: false,
+    tweets: [],
+    loadingTweets: false,
+    skip: 0,
+    limit: 5,
+    error: null,
   }),
   actions: {
     // Установка пользователя
@@ -48,6 +58,7 @@ export const useUserStore = defineStore('user', {
         const data = await loginUser(email, password);
         this.setUser(data.userName, data.token);
       } catch (error) {
+        this.error = 'Ошибка при логине. Пожалуйста, попробуйте снова.';
         console.error('Ошибка при логине:', error);
         throw error;
       }
@@ -59,6 +70,7 @@ export const useUserStore = defineStore('user', {
         await registerUser({ name, email, password });
         alert('Регистрация прошла успешно');
       } catch (error) {
+        this.error = 'Ошибка при регистрации. Пожалуйста, попробуйте снова.';
         console.error('Ошибка при регистрации:', error);
         throw error;
       }
@@ -72,18 +84,29 @@ export const useUserStore = defineStore('user', {
         }
         await saveTweet(tweetBody, imageFile, this.userName, this.token);
       } catch (error) {
+        this.error = 'Ошибка при сохранении твита. Попробуйте снова.';
         console.error('Ошибка при сохранении твита:', error);
         throw error;
       }
     },
 
-    // Получение списка твитов через API
     async fetchTweets() {
+      if (this.loadingTweets) return; // избегаем повторных запросов
+
+      this.loadingTweets = true;
+      this.error = null; // сбрасываем ошибку перед запросом
       try {
-        return await fetchTweets();
+        const tweets = await fetchTweets({ limit: this.limit, skip: this.skip });
+
+        this.tweets = [...this.tweets, ...tweets];
+
+        this.skip += this.limit;
       } catch (error) {
+        this.error = 'Ошибка при получении твитов. Пожалуйста, попробуйте позже.';
         console.error('Ошибка при получении твитов:', error);
         throw error;
+      } finally {
+        this.loadingTweets = false;
       }
     },
   },
