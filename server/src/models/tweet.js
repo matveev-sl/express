@@ -13,6 +13,10 @@ const tweetSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  image: { 
+    type: String,
+    default: null, 
+  },
 });
 
 const Tweet = mongoose.model('Tweet', tweetSchema);
