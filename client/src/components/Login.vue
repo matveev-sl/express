@@ -28,24 +28,15 @@ const password = ref('');
 
 const login = async () => {
   try {
-    const response = await loginUser(email.value, password.value);
-    const { userName, token } = response; // Извлекаем userName из ответа
+    const { userName, token } = await loginUser(email.value, password.value);
     userStore.setUser(userName, token); // Сохраняем имя пользователя и токен в хранилище
     console.log("Данные успешно переданы в стор:", { userName, token });
     close();
   } catch (error) {
     console.error('Ошибка при логине:', error);
-    if (error.response) {
-      if (error.response.status === 400) {
-        alert('Пользователь с таким email не существует.');
-      } else if (error.response.status === 401) {
-        alert('Неверный пароль.');
-      } else {
-        alert('Произошла ошибка при авторизации. Попробуйте снова.');
-      }
-    } else {
-      alert('Произошла неожиданная ошибка.');
-    }
+ 
+     alert(error);
+    
   }
 };
 </script>

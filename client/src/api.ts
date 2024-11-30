@@ -25,10 +25,10 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body =
   let response;
   const headers = isAuthorized ? getAuthHeaders() : {};
   
-  // Проверка на использование FormData
-  if (body instanceof FormData) {
-    headers['headers']['Content-Type'] = 'multipart/form-data';
-  }
+  
+  // if (body instanceof FormData) {
+  //   headers['headers']['Content-Type'] = 'multipart/form-data';
+  // }
   
   try {
     switch (method) {
@@ -57,41 +57,23 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body =
   }
   
   console.log ("Ответ сервера:", response);
-  return response;
+  return response.data;
 }
 
 
 export const loginUser = async (email: string, password: string) => {
-  try {
-    const response = await axios.post(`${BACKEND_URL}/users/login`, { email, password });
-    const data = response.data;
-
-    if (data.token) {
-      const userStore = useUserStore();
-      userStore.setUser({
-        token: data.token,
-        userName: data.userName,
-      });
-    }
-
+  
+    const data = await callApi(`/users/login`, false,'POST',{ email, password });
+    console.log(data)
+    // if (data.token) {
+    //   const userStore = useUserStore();
+    //   userStore.setUser({
+    //     token: data.token,
+    //     userName: data.userName,
+    //   });
+    // }
+    
     return data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status;
-      const message = error.response?.data?.message;
-
-      if (status === 400) {
-        console.error('Неверные данные для входа:', message);
-        throw new Error('Неверные данные для входа');
-      } else if (status === 500) {
-        console.error('Ошибка на сервере при попытке входа:', message);
-        throw new Error('Ошибка на сервере, попробуйте позже');
-      } 
-    }
-
-    console.error('Ошибка при попытке входа:', error);
-    throw new Error('Ошибка на сервере, попробуйте позже');
-  }
 };
 
 export const registerUser = async (data: { name: string, email: string, password: string }) => {
@@ -120,15 +102,13 @@ export const saveTweet = async (tweetBody: string, imageFile: File | null, userN
     });
     const headers = {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'multipart/form-data', // Убедитесь, что сервер поддерживает форму типа multipart
+      // 'Content-Type': 'multipart/form-data', // Убедитесь, что сервер поддерживает форму типа multipart
     };
     
     await callApi('/tweets', true, 'POST', formData, headers);
-
-    alert('Твит сохранен!');
   } catch (error) {
     console.error('Ошибка при сохранении твита:', error);
-    alert('Не удалось сохранить твит');
+    throw error;
   }
 };
 
