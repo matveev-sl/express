@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { getUserByEmail, createUser, comparePassword } = require('../actions/users.actions');
+const e = require('cors');
 const router = Router();
 
 router.post('/register', async (req, res) => {
@@ -34,10 +35,18 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'Пользователь с таким Email не существует' }); // Ожидаемая ошибка
     }
+    // const user = await getUserWithPasswordByEmail(email); TODO одной функцией
+    
 
 
-    if (!comparePassword(user, password)) {
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь с таким Email не существует' }); // Ожидаемая ошибка
+    }
+
+    if (!comparePassword(email, password)) {
+    
       return res.status(401).json({ message: 'Пароль неверен' }); // Ожидаемая ошибка
+
     }
 
 
