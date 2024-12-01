@@ -8,7 +8,8 @@ import { createPinia } from 'pinia'
 loadFonts()
 
 createApp(App)
+  .use(createPinia())
   .use(router)
   .use(vuetify)
-  .use(createPinia()) // Подключаем Pinia
+
   .mount('#app') // Монтируем приложение

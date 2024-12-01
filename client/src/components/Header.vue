@@ -45,7 +45,7 @@ import { ref, onMounted } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Register from './Register.vue';
 import Login from './Login.vue';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/users.store';
 import { useRouter } from 'vue-router';
 
 const showModal = ref(false);

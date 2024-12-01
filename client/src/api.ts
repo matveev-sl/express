@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/users.store';
 
 
 const BACKEND_URL = 'http://localhost:3000';
