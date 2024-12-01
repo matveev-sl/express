@@ -21,29 +21,34 @@ const getAuthHeaders = () => {
   };
 };
 
-async function callApi(url: string, isAuthorized = false, method = 'GET', body = undefined) {
+// Функция callApi с правильным типом для body
+async function callApi(url: string, isAuthorized = false, method = 'GET', body: any = undefined) {
   let response;
   const headers = isAuthorized ? getAuthHeaders() : {};
   
-  
-  // if (body instanceof FormData) {
-  //   headers['headers']['Content-Type'] = 'multipart/form-data';
-  // }
+  // Если передается FormData, нужно установить Content-Type
+  if (body instanceof FormData) {
+    headers['headers']['Content-Type'] = 'multipart/form-data';
+  }
   
   try {
     switch (method) {
       case 'GET':
-        response = await axios.get(`${BACKEND_URL}${url}`, headers);
+        // Если GET, параметры передаются в URL, а не в теле запроса
+        response = await axios.get(`${BACKEND_URL}${url}`, {
+          params: body,  // Используем body как параметры запроса для GET
+          headers,
+        });
         break;
       case 'POST':
-        response = await axios.post(`${BACKEND_URL}${url}`, body, headers);
+        // Если POST, body передается как тело запроса
+        response = await axios.post(`${BACKEND_URL}${url}`, body, { headers });
         break;
       default:
         throw new Error("callApi не поддерживает указанный метод");
     }
   } catch (error) {
     console.error('Ошибка в callApi:', error);
-    
     if (axios.isAxiosError(error)) {
       if (error.code === "ERR_NETWORK") {
         throw new Error("Нет соединения с сервером");
@@ -61,18 +66,11 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body =
 }
 
 
+
 export const loginUser = async (email: string, password: string) => {
   
     const data = await callApi(`/users/login`, false,'POST',{ email, password });
-    console.log(data)
-    // if (data.token) {
-    //   const userStore = useUserStore();
-    //   userStore.setUser({
-    //     token: data.token,
-    //     userName: data.userName,
-    //   });
-    // }
-    
+    console.log(data)  
     return data;
 };
 
@@ -95,9 +93,9 @@ export const saveTweet = async (tweetBody: string, imageFile: File | null, userN
     console.log('FormData перед отправкой:');
     formData.forEach((value, key) => {
       if (value instanceof File) {
-        console.log(`${key}: ${value.name}, ${value.size} bytes`);  // Логируем имя и размер файла
+        console.log(`${key}: ${value.name}, ${value.size} bytes`);  
       } else {
-        console.log(`${key}: ${value}`); // Логируем обычные данные
+        console.log(`${key}: ${value}`); 
       }
     });
     const headers = {
@@ -112,18 +110,17 @@ export const saveTweet = async (tweetBody: string, imageFile: File | null, userN
   }
 };
 
-export const fetchTweets = async (skip: number, limit: number) => {
+export const fetchTweets = async (skip: number, limit: number, searchQuery?: string) => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/tweets`, {
-      params: {
-        skip,  
-        limit, 
-      },
-      headers: getAuthHeaders(),  
-    });
-    return response.data;
+    const params: { skip: number, limit: number, searchQuery?: string } = { skip, limit };
+    if (searchQuery) {
+      params.searchQuery = searchQuery;
+    }
+    const response = await callApi('/tweets', true, 'GET', params);
+    return response; 
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     throw new Error('Не удалось получить твиты');
   }
 };
+

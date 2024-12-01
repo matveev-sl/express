@@ -4,9 +4,10 @@ const path = require('path');
 // Функция создания твита с учетом изображения
 async function createTweet(text, userName, imageFile) {
 
+  let imagePath = null; // Объявляем переменную
   if (imageFile) {
     imagePath = imageFile; 
-    console.log ("Сохраняется ли", imagePath);
+    console.log("Сохраняется ли", imagePath);
   }
 
   const tweet = new Tweet({

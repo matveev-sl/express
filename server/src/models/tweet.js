@@ -18,6 +18,7 @@ const tweetSchema = new mongoose.Schema({
     default: null, 
   },
 });
+tweetSchema.index({ text: 'text' });
 
 const Tweet = mongoose.model('Tweet', tweetSchema);
 

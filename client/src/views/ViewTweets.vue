@@ -32,8 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { fetchTweets } from '@/api'; // Функция для получения твитов с API
+import { useRoute } from 'vue-router'; 
 
 const tweets = ref<Array<any>>([]); // Массив твитов
 const loading = ref<boolean>(true); // Состояние загрузки
@@ -41,19 +42,19 @@ const skip = ref<number>(0); // Параметр для пагинации
 const limit = ref<number>(5); // Лимит для пагинации
 const noMoreTweets = ref<boolean>(false); // Флаг, если твиты больше не загружаются
 const BASE_URL = 'http://localhost:3000';
+const searchQuery = ref('');
+const route = useRoute();
 
 const getFullImageUrl = (imagePath: string): string => {
   return `${BASE_URL}/${imagePath}`;
 };
 
-// Функция для загрузки твитов
-const fetchTweetsAction = async () => {
+const fetchTweetsAction = async (query?: string) => {
   try {
     const currentScrollPosition = window.scrollY;
-    const newTweets = await fetchTweets(skip.value, limit.value); 
+    const newTweets = await fetchTweets(skip.value, limit.value, query);
     if (newTweets.length === 0) {
       noMoreTweets.value = true; 
-     
     } else {
       tweets.value.push(...newTweets); 
       skip.value += limit.value; 
@@ -71,11 +72,27 @@ const fetchTweetsAction = async () => {
 // Функция для загрузки дополнительных твитов по кнопке
 const loadMoreTweets = () => {
   loading.value = true;
-  fetchTweetsAction();
+  fetchTweetsAction(route.query.search as string | undefined);
 };
 
 // Загружаем твиты при монтировании компонента
-onMounted(fetchTweetsAction);
+onMounted(() => {
+  fetchTweetsAction(route.query.search as string | undefined);
+});
+
+// Наблюдаем за изменением параметра поиска в URL
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    console.log('Параметр поиска:', newSearch);
+    searchQuery.value = newSearch || '';
+    tweets.value = []; // Сбрасываем текущий список твитов
+    skip.value = 0;
+    noMoreTweets.value = false;
+    fetchTweetsAction(newSearch as string | undefined); // Передаем новый параметр
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
