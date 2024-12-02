@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Подключение к MongoDB
-mongoose.connect('mongodb://localhost:27017/your_database_name', {
+mongoose.connect('mongodb://root:example@localhost:27017', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {

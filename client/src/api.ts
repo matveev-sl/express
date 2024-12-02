@@ -10,7 +10,8 @@ const getAuthHeaders = () => {
   const userName = userStore.userName;
 
   if (!token || !userName) {
-    throw new Error('Пользователь не авторизован');
+    // throw new Error('Пользователь не авторизован');
+    return {headers: {}}
   }
 
   return {
@@ -25,12 +26,12 @@ const getAuthHeaders = () => {
 async function callApi(url: string, isAuthorized = false, method = 'GET', body: any = undefined) {
   let response;
   const headers = isAuthorized ? getAuthHeaders() : {};
-  
+
   // Если передается FormData, нужно установить Content-Type
   if (body instanceof FormData) {
     headers['headers']['Content-Type'] = 'multipart/form-data';
   }
-  
+
   try {
     switch (method) {
       case 'GET':
@@ -60,7 +61,7 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body: 
     }
     throw error; // Если ошибка не относится к Axios
   }
-  
+
   console.log ("Ответ сервера:", response);
   return response.data;
 }
@@ -68,9 +69,9 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body: 
 
 
 export const loginUser = async (email: string, password: string) => {
-  
+
     const data = await callApi(`/users/login`, false,'POST',{ email, password });
-    console.log(data)  
+    console.log(data)
     return data;
 };
 
@@ -80,29 +81,29 @@ export const registerUser = async (data: { name: string, email: string, password
 
 
 
-export const saveTweet = async (tweetBody: string, imageFile: File | null, userName: string, token: string) => {
+export const postTweet = async (tweetBody: string, imageFile: File | null, userName: string, token: string) => {
   try {
     console.log("какие данные передает", tweetBody, imageFile, userName, token)
     const formData = new FormData();
-    
+
     formData.append('text', tweetBody);
-    
+
     if (imageFile) {
       formData.append('image', imageFile);
     }
     console.log('FormData перед отправкой:');
     formData.forEach((value, key) => {
       if (value instanceof File) {
-        console.log(`${key}: ${value.name}, ${value.size} bytes`);  
+        console.log(`${key}: ${value.name}, ${value.size} bytes`);
       } else {
-        console.log(`${key}: ${value}`); 
+        console.log(`${key}: ${value}`);
       }
     });
     const headers = {
       'Authorization': `Bearer ${token}`,
       // 'Content-Type': 'multipart/form-data', // Убедитесь, что сервер поддерживает форму типа multipart
     };
-    
+
     await callApi('/tweets', true, 'POST', formData, headers);
   } catch (error) {
     console.error('Ошибка при сохранении твита:', error);
@@ -117,7 +118,7 @@ export const fetchTweets = async (skip: number, limit: number, searchQuery?: str
       params.searchQuery = searchQuery;
     }
     const response = await callApi('/tweets', true, 'GET', params);
-    return response; 
+    return response;
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     throw new Error('Не удалось получить твиты');

@@ -6,7 +6,7 @@ const router = Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); 
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Уникальное имя для файла
@@ -49,13 +49,13 @@ router.get('/', async (req, res) => {
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 5;
     const tweets = await getPaginatedTweets(Number(limit), Number(skip));
-    const searchQuery = req.query.searchQuery || '';  
-    const query = searchQuery
-      ? { text: { $regex: searchQuery, $options: 'i' } }  // Поиск по тексту, нечувствительный к регистру
-      : {};
-      const allTweets = await getPaginatedTweets(Number(limit), Number(skip), query);
+    // const searchQuery = req.query.searchQuery || '';
+    // const query = searchQuery
+    //   ? { text: { $regex: searchQuery, $options: 'i' } }  // Поиск по тексту, нечувствительный к регистру
+    //   : {};
+    //   const allTweets = await getPaginatedTweets(Number(limit), Number(skip), query);
 
-    res.status(200).json(allTweets);
+    res.status(200).json(tweets);
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     res.status(500).json({ message: 'Ошибка при получении твитов' });

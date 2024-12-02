@@ -1,16 +1,16 @@
 <template>
   <div class="tweets-container">
     <h1>Просмотреть твиты</h1>
-    
+
     <!-- Состояние загрузки -->
-   
+    <div v-if="tweetsStore.isLoading">Loading...</div>
 
     <!-- Сообщение, если нет твитов -->
-
+    <div v-else-if="tweetsStore.tweets.length===0">No tweets...</div>
 
     <!-- Список твитов -->
-    <ul class="tweets-list">
-      <li v-for="tweet in tweets" :key="tweet._id" class="tweet-item">
+    <ul v-else class="tweets-list">
+      <li v-for="tweet in tweetsStore.tweets" :key="tweet._id" class="tweet-item">
         <div class="tweet-content">
           <!-- Имя пользователя и текст -->
           <p><strong>{{ tweet.userName }}:</strong> {{ tweet.text }}</p>
@@ -32,15 +32,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router'; 
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useTweetsStore } from '@/stores/tweets.store';
 const tweetsStore = useTweetsStore();
-const isLoading = tweetsStore.isLoading
-const loadMoreTweets = () => {tweetsStore.loadMoreTweets();
+const loadMoreTweets = () => {
+  tweetsStore.loadMoreTweets();
   console.log ('Loadmore tweets Component')
 }
-const tweets = tweetsStore.tweets
 const route = useRoute();
 const BASE_URL = 'http://localhost:3000/'
 
@@ -49,11 +48,8 @@ const getFullImageUrl = (imagePath: string): string => {
 };
 
 onMounted(() => {
-tweetsStore.loadMoreTweets();
+  tweetsStore.loadMoreTweets();
 });
-console.log('tweetstore', tweetsStore.tweets)
-console.log('isloading', tweetsStore.isLoading)
-console.log('tweets', tweets)
 watch(
   () => route.query.search,
   (newSearch) => {
