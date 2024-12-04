@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '@/stores/users.store';
+import type {Tweet} from "@/stores/tweets.store";
 
 
 const BACKEND_URL = 'http://localhost:3000';
@@ -11,43 +12,40 @@ const getAuthHeaders = () => {
 
   if (!token || !userName) {
     // throw new Error('Пользователь не авторизован');
-    return {headers: {}}
+    return {}
   }
 
   return {
-    headers: {
-      'X-Token': token,
-      'X-User': userName,
-    },
+    'X-Token': token,
+    'X-User': userName,
   };
 };
 
 // Функция callApi с правильным типом для body
 async function callApi(url: string, isAuthorized = false, method = 'GET', body: any = undefined) {
-  let response;
   const headers = isAuthorized ? getAuthHeaders() : {};
 
   // Если передается FormData, нужно установить Content-Type
   if (body instanceof FormData) {
-    headers['headers']['Content-Type'] = 'multipart/form-data';
+    headers['Content-Type'] = 'multipart/form-data';
+  }
+
+  let serverCall
+  switch (method) {
+    case 'GET':
+      serverCall = axios.get(`${BACKEND_URL}${url}`, { headers });
+      break;
+    case 'POST':
+      serverCall =  axios.post(`${BACKEND_URL}${url}`, body, { headers });
+      break;
+    default:
+      throw new Error("callApi не поддерживает указанный метод");
   }
 
   try {
-    switch (method) {
-      case 'GET':
-        // Если GET, параметры передаются в URL, а не в теле запроса
-        response = await axios.get(`${BACKEND_URL}${url}`, {
-          params: body,  // Используем body как параметры запроса для GET
-          headers,
-        });
-        break;
-      case 'POST':
-        // Если POST, body передается как тело запроса
-        response = await axios.post(`${BACKEND_URL}${url}`, body, { headers });
-        break;
-      default:
-        throw new Error("callApi не поддерживает указанный метод");
-    }
+    const response = await serverCall
+    console.log ("Ответ сервера:", response);
+    return response.data;
   } catch (error) {
     console.error('Ошибка в callApi:', error);
     if (axios.isAxiosError(error)) {
@@ -61,12 +59,7 @@ async function callApi(url: string, isAuthorized = false, method = 'GET', body: 
     }
     throw error; // Если ошибка не относится к Axios
   }
-
-  console.log ("Ответ сервера:", response);
-  return response.data;
 }
-
-
 
 export const loginUser = async (email: string, password: string) => {
 
@@ -79,46 +72,25 @@ export const registerUser = async (data: { name: string, email: string, password
     return await callApi(`/users/register`, false, 'POST',  data );
 };
 
-
-
-export const postTweet = async (tweetBody: string, imageFile: File | null, userName: string, token: string) => {
+export const postTweet = async (tweetBody: string, imageFile: File | null) => {
   try {
-    console.log("какие данные передает", tweetBody, imageFile, userName, token)
     const formData = new FormData();
-
     formData.append('text', tweetBody);
-
     if (imageFile) {
       formData.append('image', imageFile);
     }
-    console.log('FormData перед отправкой:');
-    formData.forEach((value, key) => {
-      if (value instanceof File) {
-        console.log(`${key}: ${value.name}, ${value.size} bytes`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
-    });
-    const headers = {
-      'Authorization': `Bearer ${token}`,
-      // 'Content-Type': 'multipart/form-data', // Убедитесь, что сервер поддерживает форму типа multipart
-    };
-
-    await callApi('/tweets', true, 'POST', formData, headers);
+    await callApi('/tweets', true, 'POST', formData);
   } catch (error) {
     console.error('Ошибка при сохранении твита:', error);
     throw error;
   }
 };
 
-export const fetchTweets = async (skip: number, limit: number, query?: string) => {
+export const fetchTweets = async (skip: number, limit: number, query?: string): Promise<{ count: number, tweets: Tweet[] }> => {
   try {
-    const params: { skip: number, limit: number, query?: string } = { skip, limit };
-    if (query) {
-      params.query = query;
-    }
-    const response = await callApi('/tweets', true, 'GET', params);
-    return response;
+    const params = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+    const data = await callApi(`/tweets?${params.toString()}`, true, 'GET', params);
+    return { count: data.count, tweets: data.tweets };
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     throw new Error('Не удалось получить твиты');

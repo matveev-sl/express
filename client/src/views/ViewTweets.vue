@@ -3,14 +3,14 @@
     <h1>Просмотреть твиты</h1>
 
     <!-- Состояние загрузки -->
-    <div v-if="tweetsStore.isLoading && tweetsStore.tweets.length === 0">Loading...</div>
+    <div v-if="tweetsStore.isLoading">Loading...</div>
 
     <!-- Сообщение, если нет твитов -->
     <div v-else-if="tweetsStore.tweets.length === 0">No tweets...</div>
 
     <!-- Список твитов -->
     <ul v-else class="tweets-list">
-      <li v-for="tweet in tweetsStore.tweets" :key="tweet._id" class="tweet-item">
+      <li v-for="tweet in tweetsStore.tweets" :key="tweet.id" class="tweet-item">
         <div class="tweet-content">
           <!-- Имя пользователя и текст -->
           <p><strong>{{ tweet.userName }}:</strong> {{ tweet.text }}</p>
@@ -21,12 +21,9 @@
       </li>
     </ul>
 
-    <div v-if="tweetsStore.isLoading && tweetsStore.tweets.length > 0" class="loading-more">Loading more tweets...</div>
+    <div v-if="tweetsStore.isLoading" class="loading-more">Loading more tweets...</div>
 
-    <div v-if="!tweetsStore.isLoading" class="no-more-tweets">
-      Больше твитов нет
-    </div>
-    
+    <div v-if="!tweetsStore.isMoreTweets" class="no-more-tweets">Больше твитов нет</div>
   </div>
 </template>
 
@@ -37,19 +34,14 @@ import { useTweetsStore } from '@/stores/tweets.store';
 const tweetsStore = useTweetsStore();
 const container = ref<HTMLDivElement | null>(null);
 
-const loadMoreTweets = () => {
-  if (!tweetsStore.isLoading && !tweetsStore.noMoreTweets) {
-    tweetsStore.loadMoreTweets();
-    console.log('Loadmore tweets Component');
-  }
-};
-
 const handleScroll = () => {
   if (!container.value) return;
 
   const { scrollTop, scrollHeight, clientHeight } = container.value;
   if (scrollTop + clientHeight >= scrollHeight - 50) {
-    loadMoreTweets();
+    if (!tweetsStore.isLoading && !tweetsStore.noMoreTweets) {
+      tweetsStore.loadMoreTweets();
+    }
   }
 };
 

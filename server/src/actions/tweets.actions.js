@@ -40,6 +40,7 @@ async function getPaginatedTweets(limit = 5, skip = 0) {
         text: tweet.text,
         userName: tweet.userName,
         createdAt: tweet.createdAt,
+        id: tweet._id,
         image: tweet.image, // Включаем путь к изображению
       })),
     count
