@@ -8,6 +8,7 @@ interface TweetsState {
   limit: number;
   error: string | null;
   query: string;
+  noMoreTweets: boolean;
 }
 
 export const useTweetsStore = defineStore('tweets', {
@@ -17,7 +18,8 @@ export const useTweetsStore = defineStore('tweets', {
     skip: 0,
     limit: 5,
     error: null,
-    query: ''
+    query: '',
+    noMoreTweets: false,
   }),
   actions: {
     async saveTweet(tweetBody: string, imageFile: File | null) {
@@ -25,7 +27,7 @@ export const useTweetsStore = defineStore('tweets', {
     },
 
     async loadMoreTweets() {
-        if (this.isLoading) return;
+        if (this.isLoading || this.noMoreTweets) return;
         this.isLoading = true;
         this.error = null;
         const tweets = await fetchTweets( this.skip, this.limit, this.query );

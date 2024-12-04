@@ -1,12 +1,12 @@
 <template>
-  <div class="tweets-container">
+  <div class="tweets-container" ref="container">
     <h1>Просмотреть твиты</h1>
 
     <!-- Состояние загрузки -->
-    <div v-if="tweetsStore.isLoading">Loading...</div>
+    <div v-if="tweetsStore.isLoading && tweetsStore.tweets.length === 0">Loading...</div>
 
     <!-- Сообщение, если нет твитов -->
-    <div v-else-if="tweetsStore.tweets.length===0">No tweets...</div>
+    <div v-else-if="tweetsStore.tweets.length === 0">No tweets...</div>
 
     <!-- Список твитов -->
     <ul v-else class="tweets-list">
@@ -21,42 +21,46 @@
       </li>
     </ul>
 
-    <!-- Кнопка для загрузки дополнительных твитов -->
-    <div >
-      <button @click="loadMoreTweets" class="load-more-button">Загрузить еще</button>
-    </div>
+    <div v-if="tweetsStore.isLoading && tweetsStore.tweets.length > 0" class="loading-more">Loading more tweets...</div>
 
-    <!-- Сообщение, если все твиты загружены -->
-    <!-- <div v-if="noMoreTweets" class="no-more-tweets">Больше твитов нет</div> -->
+    <div v-if="tweetsStore.noMoreTweets" class="no-more-tweets">Больше твитов нет</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { onMounted, ref, onBeforeUnmount } from 'vue';
 import { useTweetsStore } from '@/stores/tweets.store';
-const tweetsStore = useTweetsStore();
-const loadMoreTweets = () => {
-  tweetsStore.loadMoreTweets();
-  console.log ('Loadmore tweets Component')
-}
-const route = useRoute();
-const BASE_URL = 'http://localhost:3000/'
 
-const getFullImageUrl = (imagePath: string): string => {
-  return `${BASE_URL}/${imagePath}`;
+const tweetsStore = useTweetsStore();
+const container = ref<HTMLDivElement | null>(null);
+
+const loadMoreTweets = () => {
+  if (!tweetsStore.isLoading && !tweetsStore.noMoreTweets) {
+    tweetsStore.loadMoreTweets();
+    console.log('Loadmore tweets Component');
+  }
+};
+
+const handleScroll = () => {
+  if (!container.value) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = container.value;
+  if (scrollTop + clientHeight >= scrollHeight - 50) {
+    loadMoreTweets();
+  }
 };
 
 onMounted(() => {
   tweetsStore.loadMoreTweets();
+  container.value?.addEventListener('scroll', handleScroll);
 });
-watch(
-  () => route.query.search,
-  (newSearch) => {
-  console.log('Параметр поиска:', newSearch);
-  },
-  { immediate: true }
-);
+
+onBeforeUnmount(() => {
+  container.value?.removeEventListener('scroll', handleScroll);
+});
+
+const BASE_URL = 'http://localhost:3000/';
+const getFullImageUrl = (imagePath: string): string => `${BASE_URL}${imagePath}`;
 </script>
 
 <style scoped>
@@ -64,6 +68,8 @@ watch(
   max-width: 600px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
+  height: 80vh; /* Ограниченная высота для скролла */
+  overflow-y: auto;
 }
 
 h1 {
@@ -108,19 +114,11 @@ h1 {
   border-radius: 8px;
 }
 
-.load-more-button {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.load-more-button:hover {
-  background-color: #45a049;
+.loading-more {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #666;
 }
 
 .no-more-tweets {
