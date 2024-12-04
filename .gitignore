@@ -1,5 +1,6 @@
-/node_modules
+**/**/node_modules
 /mongo_data
 .idea
 .DS_Store
 /uploads
+**/**/.env

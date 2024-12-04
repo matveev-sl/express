@@ -1,19 +1,18 @@
 const { Tweet } = require('../models/tweet');
-const path = require('path');
 
 // Функция создания твита с учетом изображения
 async function createTweet(text, userName, imageFile) {
 
   let imagePath = null; // Объявляем переменную
   if (imageFile) {
-    imagePath = imageFile; 
+    imagePath = imageFile;
     console.log("Сохраняется ли", imagePath);
   }
 
   const tweet = new Tweet({
     text,
     userName,
-    image: imagePath, 
+    image: imagePath,
   });
 
   await tweet.save();
@@ -21,29 +20,30 @@ async function createTweet(text, userName, imageFile) {
     text: tweet.text,
     userName: tweet.userName,
     createdAt: tweet.createdAt,
-    image: tweet.image, 
+    image: tweet.image,
   };
 }
 
 // Функция получения всех твитов
 async function getPaginatedTweets(limit = 5, skip = 0) {
-  
-  const countPromise =  Tweet.countDocuments() 
+
+  const countPromise =  Tweet.countDocuments()
   const tweetsPromise = Tweet.find()
     .sort({ createdAt: -1 }) // Сортировка от новых к старым
     .skip(skip)              // Пропускаем определенное количество твитов
     .limit(limit)            // Ограничиваем количество твитов
     .lean();
-  
+
   const [count, tweets] = await Promise.all ([countPromise, tweetsPromise])
   return {
-      tweets : tweets.map(tweet => ({
-      text: tweet.text,
-      userName: tweet.userName,
-      createdAt: tweet.createdAt,
-      image: tweet.image, // Включаем путь к изображению
-  })), 
-  count}
+    tweets: tweets.map(tweet => ({
+        text: tweet.text,
+        userName: tweet.userName,
+        createdAt: tweet.createdAt,
+        image: tweet.image, // Включаем путь к изображению
+      })),
+    count
+  }
 }
 
 module.exports = {

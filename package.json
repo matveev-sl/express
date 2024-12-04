@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "pinia": "^2.2.5"
+    "dotenv": "^16.4.7"
   }
 }
