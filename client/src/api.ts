@@ -111,11 +111,11 @@ export const postTweet = async (tweetBody: string, imageFile: File | null, userN
   }
 };
 
-export const fetchTweets = async (skip: number, limit: number, searchQuery?: string) => {
+export const fetchTweets = async (skip: number, limit: number, query?: string) => {
   try {
-    const params: { skip: number, limit: number, searchQuery?: string } = { skip, limit };
-    if (searchQuery) {
-      params.searchQuery = searchQuery;
+    const params: { skip: number, limit: number, query?: string } = { skip, limit };
+    if (query) {
+      params.query = query;
     }
     const response = await callApi('/tweets', true, 'GET', params);
     return response;

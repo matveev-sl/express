@@ -23,7 +23,10 @@
 
     <div v-if="tweetsStore.isLoading && tweetsStore.tweets.length > 0" class="loading-more">Loading more tweets...</div>
 
-    <div v-if="tweetsStore.noMoreTweets" class="no-more-tweets">Больше твитов нет</div>
+    <div v-if="!tweetsStore.isLoading" class="no-more-tweets">
+      Больше твитов нет
+    </div>
+    
   </div>
 </template>
 

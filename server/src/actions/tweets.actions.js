@@ -27,18 +27,23 @@ async function createTweet(text, userName, imageFile) {
 
 // Функция получения всех твитов
 async function getPaginatedTweets(limit = 5, skip = 0) {
-  const tweets = await Tweet.find()
+  
+  const countPromise =  Tweet.countDocuments() 
+  const tweetsPromise = Tweet.find()
     .sort({ createdAt: -1 }) // Сортировка от новых к старым
     .skip(skip)              // Пропускаем определенное количество твитов
     .limit(limit)            // Ограничиваем количество твитов
     .lean();
-
-  return tweets.map(tweet => ({
-    text: tweet.text,
-    userName: tweet.userName,
-    createdAt: tweet.createdAt,
-    image: tweet.image, // Включаем путь к изображению
-  }));
+  
+  const [count, tweets] = await Promise.all ([countPromise, tweetsPromise])
+  return {
+      tweets : tweets.map(tweet => ({
+      text: tweet.text,
+      userName: tweet.userName,
+      createdAt: tweet.createdAt,
+      image: tweet.image, // Включаем путь к изображению
+  })), 
+  count}
 }
 
 module.exports = {

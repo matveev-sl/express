@@ -41,18 +41,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Register from './Register.vue';
 import Login from './Login.vue';
 import { useUserStore } from '@/stores/users.store';
 import { useRouter } from 'vue-router';
-
+import { useTweetsStore } from '@/stores/tweets.store';
 const showModal = ref(false);
 const isLoginMode = ref(true);
 const userStore = useUserStore();
+const tweetsStore = useTweetsStore();
 const router = useRouter();
-const searchQuery = ref('');
+const query = ref(tweetsStore.query);;
 
 onMounted(() => {
   userStore.initializeUser();
@@ -81,8 +82,16 @@ const logout = () => {
   userStore.logout(); // Сбрасываем данные пользователя в хранилище
 };
 
-const updateSearch = () => {
-  router.push({ query: { search: searchQuery.value } }); 
+// const updateSearch = () => {
+//   router.push({ query: { search: query.value } }); 
+// };
+const updateSearch = async () => {
+  try {
+    const result = await searchTweets(searchQuery.value);
+    tweetStore.setTweets(result); // Сохраняем в состояние Pinia
+  } catch (error) {
+    console.error('Ошибка при поиске твитов:', error);
+  }
 };
 </script>
 <style scoped>
