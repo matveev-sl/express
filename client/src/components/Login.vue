@@ -12,7 +12,7 @@
 <script setup>
 import { ref } from 'vue';
 import { loginUser } from '@/api';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/users.store';
 
 const { close } = defineProps({
   close: {

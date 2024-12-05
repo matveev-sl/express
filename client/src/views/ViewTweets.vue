@@ -1,16 +1,16 @@
 <template>
-  <div class="tweets-container">
+  <div class="tweets-container" ref="container">
     <h1>Просмотреть твиты</h1>
-    
+
     <!-- Состояние загрузки -->
-    <div v-if="loading" class="loading">Загрузка...</div>
+    <div v-if="tweetsStore.isLoading">Loading...</div>
 
     <!-- Сообщение, если нет твитов -->
-    <div v-else-if="tweets.length === 0" class="no-tweets">Нет твитов для отображения.</div>
+    <div v-else-if="tweetsStore.tweets.length === 0">No tweets...</div>
 
     <!-- Список твитов -->
     <ul v-else class="tweets-list">
-      <li v-for="tweet in tweets" :key="tweet._id" class="tweet-item">
+      <li v-for="tweet in tweetsStore.tweets" :key="tweet.id" class="tweet-item">
         <div class="tweet-content">
           <!-- Имя пользователя и текст -->
           <p><strong>{{ tweet.userName }}:</strong> {{ tweet.text }}</p>
@@ -20,33 +20,42 @@
         </div>
       </li>
     </ul>
+
+    <div v-if="tweetsStore.isLoading" class="loading-more">Loading more tweets...</div>
+
+    <div v-if="!tweetsStore.isMoreTweets" class="no-more-tweets">Больше твитов нет</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { fetchTweets } from '@/api'; // Функция для получения твитов с API
+import { onMounted, ref, onBeforeUnmount } from 'vue';
+import { useTweetsStore } from '@/stores/tweets.store';
 
-const tweets = ref([]); // Массив твитов
-const loading = ref(true); // Состояние загрузки
-const BASE_URL = 'http://localhost:3000'
+const tweetsStore = useTweetsStore();
+const container = ref<HTMLDivElement | null>(null);
 
-const getFullImageUrl = (imagePath) => {
-  const fullUrl = `${BASE_URL}/${imagePath}`
-  console.log ("ФуллУрл", fullUrl)
-  return fullUrl;
-};
-const fetchTweetsAction = async () => {
-  try {
-    tweets.value = await fetchTweets(); // Получаем твиты
-  } catch (error) {
-    console.error('Ошибка при получении твитов:', error);
-  } finally {
-    loading.value = false; // Завершаем загрузку
+const handleScroll = () => {
+  if (!container.value) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = container.value;
+  if (scrollTop + clientHeight >= scrollHeight - 50) {
+    if (!tweetsStore.isLoading && !tweetsStore.noMoreTweets) {
+      tweetsStore.loadMoreTweets();
+    }
   }
 };
 
-onMounted(fetchTweetsAction); // Загружаем твиты при монтировании компонента
+onMounted(() => {
+  tweetsStore.loadMoreTweets();
+  container.value?.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+  container.value?.removeEventListener('scroll', handleScroll);
+});
+
+const BASE_URL = 'http://localhost:3000/';
+const getFullImageUrl = (imagePath: string): string => `${BASE_URL}${imagePath}`;
 </script>
 
 <style scoped>
@@ -54,6 +63,8 @@ onMounted(fetchTweetsAction); // Загружаем твиты при монти
   max-width: 600px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
+  height: 80vh; /* Ограниченная высота для скролла */
+  overflow-y: auto;
 }
 
 h1 {
@@ -96,5 +107,18 @@ h1 {
   height: auto;
   margin-top: 10px;
   border-radius: 8px;
+}
+
+.loading-more {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.no-more-tweets {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
 }
 </style>

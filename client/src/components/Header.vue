@@ -3,12 +3,21 @@
     <!-- Навигационные ссылки -->
     <router-link to="/view">Посмотреть твиты</router-link>
     <router-link to="/create">Создать твит</router-link>
-
+    <div class="search-container">
+      <input
+      type="text"
+      v-model="searchQuery"
+      placeholder="Поиск твитов"
+      @input="updateSearch"
+      class="search-input"
+    />
+    </div>
     <!-- Если пользователь не залогинен -->
     <div v-if="!userStore.isLoggedIn">
       <v-btn @click="open(true)">Войти</v-btn>
       <v-btn @click="open(false)">Регистрироваться</v-btn>
     </div>
+
 
     <!-- Если пользователь залогинен -->
     <div v-else>
@@ -32,17 +41,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Register from './Register.vue';
 import Login from './Login.vue';
-import { useUserStore } from '@/stores/userStore'; // Ваш Pinia Store
-onMounted(() => {
-  userStore.initializeUser();
-});
+import { useUserStore } from '@/stores/users.store';
+import { useRouter } from 'vue-router';
+import { useTweetsStore } from '@/stores/tweets.store';
 const showModal = ref(false);
 const isLoginMode = ref(true);
 const userStore = useUserStore();
+const tweetsStore = useTweetsStore();
+const router = useRouter();
+const query = ref(tweetsStore.query);;
+
+onMounted(() => {
+  userStore.initializeUser();
+});
+
 
 const open = (loginMode: boolean) => {
   isLoginMode.value = loginMode; // Устанавливаем режим (вход или регистрация)
@@ -65,4 +81,30 @@ const switchToLogin = () => {
 const logout = () => {
   userStore.logout(); // Сбрасываем данные пользователя в хранилище
 };
+
+// const updateSearch = () => {
+//   router.push({ query: { search: query.value } }); 
+// };
+const updateSearch = async () => {
+  try {
+    const result = await searchTweets(searchQuery.value);
+    tweetStore.setTweets(result); // Сохраняем в состояние Pinia
+  } catch (error) {
+    console.error('Ошибка при поиске твитов:', error);
+  }
+};
 </script>
+<style scoped>
+.search-container {
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.search-input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+}
+
+</style>
