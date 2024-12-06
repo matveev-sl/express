@@ -21,6 +21,8 @@
       </li>
     </ul>
 
+    <div ref="observer" class="observer"></div>
+
     <div v-if="tweetsStore.isLoading" class="loading-more">Loading more tweets...</div>
 
     <div v-if="!tweetsStore.isMoreTweets" class="no-more-tweets">Больше твитов нет</div>
@@ -28,22 +30,45 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount } from 'vue';
+import { onMounted, ref, onBeforeUnmount, watch, nextTick,} from 'vue';
 import { useTweetsStore } from '@/stores/tweets.store';
 
 const tweetsStore = useTweetsStore();
 const container = ref<HTMLDivElement | null>(null);
-
+let savedScrollTop = 0;
+const saveScrollPosition = () => {
+  if (container.value) {
+    savedScrollTop = container.value.scrollTop;
+    console.log ('savedScrollTop', savedScrollTop)
+  }
+};
+const restoreScrollPosition = async () => {
+  await nextTick();
+  if (container.value) {
+    container.value.scrollTop = savedScrollTop;
+    console.log ('Container', container.value.scrollTop)
+  }
+};
 const handleScroll = () => {
   if (!container.value) return;
 
   const { scrollTop, scrollHeight, clientHeight } = container.value;
+ 
   if (scrollTop + clientHeight >= scrollHeight - 50) {
-    if (!tweetsStore.isLoading && !tweetsStore.noMoreTweets) {
+    if (!tweetsStore.isLoading && tweetsStore.isMoreTweets) {
+      saveScrollPosition(); // Сохраняем позицию перед загрузкой
       tweetsStore.loadMoreTweets();
+      
     }
   }
 };
+
+watch(
+  () => tweetsStore.tweets,
+  async () => {
+   await restoreScrollPosition(); // Восстанавливаем позицию после обновления
+  }
+);
 
 onMounted(() => {
   tweetsStore.loadMoreTweets();
@@ -59,11 +84,15 @@ const getFullImageUrl = (imagePath: string): string => `${BASE_URL}${imagePath}`
 </script>
 
 <style scoped>
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
 .tweets-container {
   max-width: 600px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
-  height: 80vh; /* Ограниченная высота для скролла */
+  height: calc(100vh - 100px); /* Учитываем высоту других элементов */
   overflow-y: auto;
 }
 

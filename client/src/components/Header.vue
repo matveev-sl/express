@@ -3,14 +3,15 @@
     <!-- Навигационные ссылки -->
     <router-link to="/view">Посмотреть твиты</router-link>
     <router-link to="/create">Создать твит</router-link>
+    
     <div class="search-container">
       <input
-      type="text"
-      v-model="searchQuery"
-      placeholder="Поиск твитов"
-      @input="updateSearch"
-      class="search-input"
-    />
+        type="text"
+        v-model="searchQuery"
+        placeholder="Поиск твитов"
+        @input="updateSearch"
+        class="search-input"
+      />
     </div>
     <!-- Если пользователь не залогинен -->
     <div v-if="!userStore.isLoggedIn">
@@ -53,7 +54,7 @@ const isLoginMode = ref(true);
 const userStore = useUserStore();
 const tweetsStore = useTweetsStore();
 const router = useRouter();
-const query = ref(tweetsStore.query);;
+const searchQuery = ref('');
 
 onMounted(() => {
   userStore.initializeUser();
@@ -87,13 +88,14 @@ const logout = () => {
 // };
 const updateSearch = async () => {
   try {
-    const result = await searchTweets(searchQuery.value);
-    tweetStore.setTweets(result); // Сохраняем в состояние Pinia
+    tweetsStore.setQuery(searchQuery.value); // Устанавливаем текущий запрос в Pinia
+    await tweetsStore.searchTweets(); // Выполняем поиск через Pinia
   } catch (error) {
     console.error('Ошибка при поиске твитов:', error);
   }
 };
 </script>
+
 <style scoped>
 .search-container {
   display: inline-block;

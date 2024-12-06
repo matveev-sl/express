@@ -4,7 +4,7 @@ dotenv.configDotenv();
 
 const mongoUri = process.env.MONGO_URI;
 // Подключение к MongoDB
-mongoose.connect(mongoUri, {
+mongoose.connect('mongodb://localhost:27017/your_database_name', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { postTweet, fetchTweets } from '@/api';
+import { postTweet, fetchTweets, searchTweetsAPI } from '@/api';
 
 export interface Tweet {
   id: string;
@@ -38,10 +38,13 @@ export const useTweetsStore = defineStore('tweets', {
     }
   },
   actions: {
+    setQuery(newQuery) {
+      this.query = newQuery;
+    },
     async saveTweet(tweetBody: string, imageFile: File | null) {
         await postTweet(tweetBody, imageFile);
     },
-
+   
     async loadMoreTweets() {
       console.log ('Loadmoretweets')
       this.isLoading = true;
@@ -50,6 +53,22 @@ export const useTweetsStore = defineStore('tweets', {
       this.isLoading = false;
       this.tweets = [...this.tweets, ...tweets];
       this.count = count;
+    },
+    async searchTweets(query: string) {
+      console.log('SearchTweets:', query);
+      this.isLoading = true;
+      this.error = null;
+      this.query = query; // Обновляем запрос в состоянии
+      try {
+        const { tweets, count } = await searchTweetsAPI(query); // Вызываем API для поиска
+        this.tweets = tweets; // Заменяем текущие твиты результатами поиска
+        this.count = count; // Обновляем общее количество
+        this.noMoreTweets = tweets.length === 0; // Устанавливаем флаг, если твитов нет
+      } catch (error: any) {
+        this.error = error.message || 'Ошибка поиска твитов';
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 });

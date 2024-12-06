@@ -86,6 +86,8 @@ export const postTweet = async (tweetBody: string, imageFile: File | null) => {
   }
 };
 
+
+
 export const fetchTweets = async (skip: number, limit: number, query?: string): Promise<{ count: number, tweets: Tweet[] }> => {
   try {
     const params = new URLSearchParams({ skip: String(skip), limit: String(limit) });
@@ -94,6 +96,18 @@ export const fetchTweets = async (skip: number, limit: number, query?: string): 
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     throw new Error('Не удалось получить твиты');
+  }
+};
+
+export const searchTweetsAPI = async (query: string): Promise<{ count: number, tweets: Tweet[] }> => {
+  try {
+    // Передаем параметр поиска как query string
+    const params = new URLSearchParams({ query });
+    const data = await callApi(`/tweets/search?${params.toString()}`, true, 'GET');
+    return { count: data.count, tweets: data.tweets };
+  } catch (error) {
+    console.error('Ошибка при поиске твитов:', error);
+    throw new Error('Не удалось выполнить поиск твитов');
   }
 };
 

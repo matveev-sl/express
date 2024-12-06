@@ -48,13 +48,9 @@ router.get('/', async (req, res) => {
   try {
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 5;
-    const tweets = await getPaginatedTweets(Number(limit), Number(skip));
-    // const searchQuery = req.query.searchQuery || '';
-    // const query = searchQuery
-    //   ? { text: { $regex: searchQuery, $options: 'i' } }  // Поиск по тексту, нечувствительный к регистру
-    //   : {};
-    //   const allTweets = await getPaginatedTweets(Number(limit), Number(skip), query);
+    const searchQuery = req.query.searchQuery || '';
 
+    const tweets = await getPaginatedTweets(limit, skip, searchQuery);
     res.status(200).json(tweets);
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
