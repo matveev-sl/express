@@ -88,12 +88,13 @@ const logout = () => {
 // };
 const updateSearch = async () => {
   try {
-    tweetsStore.setQuery(searchQuery.value); // Устанавливаем текущий запрос в Pinia
-    await tweetsStore.searchTweets(); // Выполняем поиск через Pinia
+    tweetsStore.setQuery(searchQuery.value);  // Устанавливаем запрос
+    await tweetsStore.searchTweets(searchQuery.value); // Выполняем поиск
   } catch (error) {
     console.error('Ошибка при поиске твитов:', error);
   }
 };
+
 </script>
 
 <style scoped>

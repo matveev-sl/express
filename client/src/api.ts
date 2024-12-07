@@ -101,6 +101,7 @@ export const fetchTweets = async (skip: number, limit: number, query?: string): 
 
 export const searchTweetsAPI = async (query: string): Promise<{ count: number, tweets: Tweet[] }> => {
   try {
+    console.log ('Параметры поиска', query)
     // Передаем параметр поиска как query string
     const params = new URLSearchParams({ query });
     const data = await callApi(`/tweets/search?${params.toString()}`, true, 'GET');
