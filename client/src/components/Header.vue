@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Register from './Register.vue';
 import Login from './Login.vue';
@@ -55,6 +55,7 @@ const userStore = useUserStore();
 const tweetsStore = useTweetsStore();
 const router = useRouter();
 const searchQuery = ref('');
+const tweets = computed(() => tweetsStore.tweets);
 
 onMounted(() => {
   userStore.initializeUser();

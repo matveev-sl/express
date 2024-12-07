@@ -1,4 +1,4 @@
-const { createTweet, getPaginatedTweets } = require('../actions/tweets.actions');
+const { createTweet, getPaginatedTweets, searchTweets} = require('../actions/tweets.actions');
 const { Router } = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Уникальное имя для файла
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`); 
   },
 });
 
@@ -48,13 +48,25 @@ router.get('/', async (req, res) => {
   try {
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 5;
-    const searchQuery = req.query.searchQuery || '';
-
-    const tweets = await getPaginatedTweets(limit, skip, searchQuery);
+    const tweets = await getPaginatedTweets(limit, skip);
     res.status(200).json(tweets);
   } catch (error) {
     console.error('Ошибка при получении твитов:', error);
     res.status(500).json({ message: 'Ошибка при получении твитов' });
+  }
+});
+
+router.get('/search', async (req, res) => {
+  try {
+    const searchQuery = req.query.query || ''; // Получаем query параметр для поиска
+    console.log('searchQuery (search route)', searchQuery);
+    
+    // Выполняем поиск твитов по запросу
+    const tweets = await searchTweets(searchQuery);
+    res.status(200).json(tweets); // Возвращаем найденные твиты
+  } catch (error) {
+    console.error('Ошибка при поиске твитов:', error);
+    res.status(500).json({ message: 'Ошибка при поиске твитов' });
   }
 });
 

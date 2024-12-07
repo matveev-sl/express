@@ -51,7 +51,17 @@ async function getPaginatedTweets(limit = 5, skip = 0, searchQuery = '') {
   };
 }
 
+async function searchTweets(query) {
+  try {
+    const tweets = await Tweet.find({ text: { $regex: query, $options: 'i' } }).exec();
+    return tweets;
+  } catch (error) {
+    throw new Error('Ошибка при поиске твитов');
+  }
+};
+
 module.exports = {
   createTweet,
-  getPaginatedTweets, // Используем эту функцию вместо getAllTweets
+  getPaginatedTweets, 
+  searchTweets
 };
