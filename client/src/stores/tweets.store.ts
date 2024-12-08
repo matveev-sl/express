@@ -60,10 +60,11 @@ export const useTweetsStore = defineStore('tweets', {
       this.error = null;
       this.query = query; // Обновляем запрос в состоянии
       try {
-        const { tweets, count } = await searchTweetsAPI(query); // Вызываем API для поиска
-        this.tweets = tweets; // Заменяем текущие твиты результатами поиска
-        this.count = count; // Обновляем общее количество
-        this.noMoreTweets = tweets.length === 0; // Устанавливаем флаг, если твитов нет
+        const { tweets, count } = await searchTweetsAPI(query); 
+        this.tweets = tweets; 
+        console.log('Обновленные твиты в сторе:', this.tweets); 
+        this.count = count; 
+        this.noMoreTweets = tweets.length === 0; 
       } catch (error: any) {
         this.error = error.message || 'Ошибка поиска твитов';
       } finally {

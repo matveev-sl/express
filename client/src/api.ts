@@ -102,10 +102,18 @@ export const fetchTweets = async (skip: number, limit: number, query?: string): 
 export const searchTweetsAPI = async (query: string): Promise<{ count: number, tweets: Tweet[] }> => {
   try {
     console.log ('Параметры поиска', query)
-    // Передаем параметр поиска как query string
     const params = new URLSearchParams({ query });
     const data = await callApi(`/tweets/search?${params.toString()}`, true, 'GET');
-    return { count: data.count, tweets: data.tweets };
+    console.log('Ответ от callApi:', data);
+    console.log('Результаты из searchTweetsAPI:', { count: data.count, tweets: data.tweets });
+    if (Array.isArray(data)) {
+      return {
+        count: data.length, // Количество твитов
+        tweets: data, // Сами твиты
+      };
+    } else {
+      throw new Error('Неверный формат данных: ожидается массив.');
+    }
   } catch (error) {
     console.error('Ошибка при поиске твитов:', error);
     throw new Error('Не удалось выполнить поиск твитов');
