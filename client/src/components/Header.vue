@@ -3,14 +3,15 @@
     <!-- Навигационные ссылки -->
     <router-link to="/view">Посмотреть твиты</router-link>
     <router-link to="/create">Создать твит</router-link>
+    
     <div class="search-container">
       <input
-      type="text"
-      v-model="searchQuery"
-      placeholder="Поиск твитов"
-      @input="updateSearch"
-      class="search-input"
-    />
+        type="text"
+        v-model="searchQuery"
+        placeholder="Поиск твитов"
+        @input="updateSearch"
+        class="search-input"
+      />
     </div>
     <!-- Если пользователь не залогинен -->
     <div v-if="!userStore.isLoggedIn">
@@ -41,22 +42,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import Modal from '@/components/Modal.vue';
 import Register from './Register.vue';
 import Login from './Login.vue';
 import { useUserStore } from '@/stores/users.store';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useTweetsStore } from '@/stores/tweets.store';
 const showModal = ref(false);
 const isLoginMode = ref(true);
 const userStore = useUserStore();
 const tweetsStore = useTweetsStore();
 const router = useRouter();
-const query = ref(tweetsStore.query);;
+const route = useRoute();
+const searchQuery = ref(route.query.search || '');
+const tweets = computed(() => tweetsStore.tweets);
 
-onMounted(() => {
+
+onMounted(async () => {
   userStore.initializeUser();
+  if (route.query.search) {
+    searchQuery.value = route.query.search as string;
+    await tweetsStore.searchTweets(searchQuery.value);
+  }
 });
 
 
@@ -87,13 +95,27 @@ const logout = () => {
 // };
 const updateSearch = async () => {
   try {
-    const result = await searchTweets(searchQuery.value);
-    tweetStore.setTweets(result); // Сохраняем в состояние Pinia
+    router.push({ query: { ...route.query, search: searchQuery.value } });
+    tweetsStore.setQuery(searchQuery.value);  // Устанавливаем запрос
+    await tweetsStore.searchTweets(searchQuery.value); // Выполняем поиск
   } catch (error) {
     console.error('Ошибка при поиске твитов:', error);
   }
 };
+watch(
+  () => route.query.search, // Наблюдаем за параметром search
+  async (newSearch) => { // Помечаем функцию как async
+    if (newSearch !== searchQuery.value) {
+      searchQuery.value = newSearch || ''; // Обновляем локальный searchQuery
+      if (newSearch) {
+        await tweetsStore.searchTweets(newSearch as string); // Выполняем поиск
+      }
+    }
+  },
+  { immediate: true } // Запуск при монтировании
+);
 </script>
+
 <style scoped>
 .search-container {
   display: inline-block;
